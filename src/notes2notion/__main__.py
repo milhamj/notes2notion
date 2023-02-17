@@ -5,12 +5,12 @@ import logging
 
 import click
 import notional
+import sys
 
 from . import apple
 from .builder import PageBuilder
 
 logger = logging.getLogger(__name__)
-
 
 class MainApp:
     """Context used during main execution."""
@@ -103,12 +103,17 @@ class MainApp:
 def main(auth, page, meta, html, title, verbose, quiet):
     """Main entry point hanlder for notes2notion."""
 
+    file_handler = logging.FileHandler(filename='execution.log')
+    stdout_handler = logging.StreamHandler(stream=sys.stdout)
+    handlers = [file_handler, stdout_handler]
+    logging_format = '[%(asctime)s] {%(filename)s:%(lineno)d} %(levelname)s - %(message)s'
+
     if verbose:
-        logging.basicConfig(level=logging.DEBUG, force=True)
+        logging.basicConfig(level=logging.DEBUG, force=True,handlers=handlers, format=logging_format)
     elif quiet:
-        logging.basicConfig(level=logging.ERROR, force=True)
+        logging.basicConfig(level=logging.ERROR, force=True, handlers=handlers, format=logging_format)
     else:
-        logging.basicConfig(level=logging.INFO, force=True)
+        logging.basicConfig(level=logging.INFO, force=True, handlers=handlers, format=logging_format)
 
     app = MainApp(auth_token=auth, page_ref=page)
 
